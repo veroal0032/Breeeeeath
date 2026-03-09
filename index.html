@@ -118,8 +118,8 @@
   }
   .stop-hint {
     position: fixed; bottom: 130px; left: 50%; transform: translateX(-50%);
-    color: rgba(255,255,255,0.3); font-family: 'Fredoka', sans-serif;
-    font-size: 0.76rem; letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.9); font-family: 'Fredoka', sans-serif;
+    font-size: 0.9rem; letter-spacing: 0.06em;
     opacity: 0; transition: opacity 0.5s; z-index: 10; white-space: nowrap;
   }
   @keyframes fadeUp {
@@ -383,14 +383,15 @@ function tick(ts){
 function start(){
   running=true; cycleStart=performance.now(); lastPhaseType=null;
   ctaArea.style.display='none';
-  stopHint.style.opacity='0.45';
+  stopHint.style.opacity='1';
   setPhaseUI(PHASES[0]);
   rafId=requestAnimationFrame(tick);
 }
 function stop(){
   running=false; cancelAnimationFrame(rafId);
-  setBodyScale(1,1); setShadowScale(1,1); setArc(0); setPulse(false);
+  setArc(0); setPulse(false);
   setPhaseUI(null); timerDots.innerHTML='';
+  cycleCount=0; counter.textContent='';
   ctaArea.style.display='block';
   stopHint.style.opacity='0'; lastPhaseType=null;
 }
