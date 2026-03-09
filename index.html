@@ -382,7 +382,7 @@ function tick(ts){
 
 function start(){
   running=true; cycleStart=performance.now(); lastPhaseType=null;
-  ctaArea.style.display='none';
+  ctaArea.style.visibility='hidden';
   stopHint.style.opacity='1';
   setPhaseUI(PHASES[0]);
   rafId=requestAnimationFrame(tick);
@@ -392,7 +392,7 @@ function stop(){
   setArc(0); setPulse(false);
   setPhaseUI(null); timerDots.innerHTML='';
   cycleCount=0; counter.textContent='';
-  ctaArea.style.display='block';
+  ctaArea.style.visibility='visible';
   stopHint.style.opacity='0'; lastPhaseType=null;
 }
 
