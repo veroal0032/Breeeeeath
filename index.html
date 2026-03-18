@@ -45,7 +45,7 @@
   .sheep-stage {
     position: relative;
     width: 280px; height: 280px;
-    cursor: pointer; -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: transparent;
     opacity: 0; animation: fadeUp 0.9s 0.5s ease forwards;
   }
 
@@ -116,12 +116,24 @@
     color: rgba(255,255,255,0.4); font-family: 'Fredoka', sans-serif;
     font-size: 0.8rem; letter-spacing: 0.06em; z-index: 10;
   }
-  .stop-hint {
+
+  /* Pause button — replaces the old stop-hint */
+  .pause-btn {
     position: fixed; bottom: 130px; left: 50%; transform: translateX(-50%);
     color: rgba(255,255,255,0.9); font-family: 'Fredoka', sans-serif;
-    font-size: 0.9rem; letter-spacing: 0.06em;
-    opacity: 0; transition: opacity 0.5s; z-index: 10; white-space: nowrap;
+    font-size: 0.9rem; font-weight: 500; letter-spacing: 0.08em;
+    padding: 0.4rem 1.6rem;
+    border: 1.5px solid rgba(255,255,255,0.38); border-radius: 100px;
+    background: rgba(255,255,255,0.1); backdrop-filter: blur(8px);
+    cursor: pointer; transition: background 0.2s, transform 0.15s, opacity 0.5s;
+    opacity: 0; pointer-events: none;
+    z-index: 10; white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
   }
+  .pause-btn:hover { background: rgba(255,255,255,0.18); }
+  .pause-btn:active { transform: translateX(-50%) scale(0.97); background: rgba(255,255,255,0.22); }
+  .pause-btn.visible { opacity: 1; pointer-events: auto; }
+
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(14px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -165,16 +177,9 @@
       <circle class="ring-pulse-el" id="ringPulseEl" cx="140" cy="140" r="125" opacity="0"/>
     </svg>
 
-    <!-- SHEEP (all layers in one SVG, shared coordinate space 280×280) -->
-    <!-- The sheep fills roughly 280×260. We'll place:
-         sombra  at y≈230 (bottom)
-         cuerpo  centered, y≈40..210
-         cara    centered, y≈80..195
-         patas   y≈185..245 (overlapping bottom of cara + cuerpo)
-    -->
+    <!-- SHEEP -->
     <svg class="sheep-svg" viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <!-- Reusable filters -->
         <filter id="ds1" x="-20%" y="-20%" width="140%" height="140%">
           <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.2)"/>
         </filter>
@@ -186,7 +191,7 @@
         </filter>
       </defs>
 
-      <!-- 1. SOMBRA — bottom, centered at x=140 y=242 -->
+      <!-- 1. SOMBRA -->
       <g id="g-sombra">
         <ellipse cx="140" cy="242" rx="72" ry="14" fill="#466360" fill-opacity="0.35"/>
       </g>
@@ -202,33 +207,24 @@
       <!-- 3. CARA -->
       <g filter="url(#ds3)">
         <g transform="translate(75, 98) scale(0.82)">
-          <!-- Face circle -->
           <circle cx="81" cy="89.5" r="54" fill="#FAC9AB"/>
           <circle cx="81" cy="89.5" r="53.5" stroke="#613333" stroke-width="1"/>
-          <!-- Nose -->
           <path d="M76.0226 109.468C75.6084 105.586 81.0274 105.436 80.9999 109.468V114.5L76.0226 109.468Z" fill="#613333" stroke="#613333" stroke-width="0.8"/>
           <path d="M81 115C81 121 72 121 72 115" stroke="#613333" stroke-width="1"/>
           <path d="M85.9774 109.468C86.3916 105.586 80.9726 105.436 81.0001 109.468V114.5L85.9774 109.468Z" fill="#613333" stroke="#613333" stroke-width="0.8"/>
           <path d="M81.0319 115C81.0319 121 90.0319 121 90.0319 115" stroke="#613333" stroke-width="1"/>
-          <!-- Left ear -->
           <path d="M43 70.1C43 79.1574 34.826 86.5 24.7428 86.5C14.6596 86.5 4.10431 86.3574 4.10431 77.3C2.51673 70.9 19.4224 56.5 29.5056 56.5C39.5888 56.5 43 61.0425 43 70.1Z" fill="#FAC9AB" stroke="#613333" stroke-width="1"/>
           <path d="M42.5 70C42.5 79.0575 34.826 86.4999 24.7428 86.4999C14.6596 86.4999 4.10431 86.3574 4.10431 77.2999C15.5 83.9999 23.5 79.5 28 77.5C42.5 69 42.5 60.9425 42.5 70Z" fill="#613333" fill-opacity="0.18"/>
-          <!-- Right ear -->
           <path d="M120 70.1C120 79.1574 128.174 86.5 138.257 86.5C148.34 86.5 158.896 86.3574 158.896 77.3C160.483 70.9 143.578 56.5 133.494 56.5C123.411 56.5 120 61.0425 120 70.1Z" fill="#FAC9AB" stroke="#613333" stroke-width="1"/>
           <path d="M120.5 70C120.5 79.0575 128.174 86.4999 138.257 86.4999C148.34 86.4999 158.896 86.3574 158.896 77.2999C147.5 83.9999 139.5 79.5 135 77.5C120.5 69 120.5 60.9425 120.5 70Z" fill="#613333" fill-opacity="0.18"/>
-          <!-- Left eye -->
           <path d="M47.0381 68.5C46.341 63.274 55.3776 58.3026 60 59.7565" stroke="#613333" stroke-width="1"/>
           <path d="M54 71.5C53.9486 79.9081 70.4481 79.9455 70.5 71.5" stroke="#613333" stroke-width="1.2"/>
           <path d="M57 76.5L54.5 79.5M63 77.5V80.5M68.5 76L71 78.5" stroke="#613333" stroke-width="0.9"/>
-          <!-- Left blush -->
           <ellipse cx="58" cy="92" rx="11" ry="4.5" fill="#FFA8CB"/>
-          <!-- Right eye -->
           <path d="M115.962 68.5C116.659 63.274 107.622 58.3026 103 59.7565" stroke="#613333" stroke-width="1"/>
           <path d="M109 71.5C109.051 79.9081 92.5519 79.9455 92.5 71.5" stroke="#613333" stroke-width="1.2"/>
           <path d="M106 76.5L108.5 79.5M100 77.5V80.5M94.5 76L92 78.5" stroke="#613333" stroke-width="0.9" stroke-opacity="0.9"/>
-          <!-- Right blush -->
           <ellipse cx="105" cy="92" rx="11" ry="4.5" fill="#FFA8CB"/>
-          <!-- Top wool tuft -->
           <path d="M21.3173 42.6358C16.8946 36.0434 19.6379 17.6273 38.3173 29.6358C33.4432 18.3391 52.8173 17.6358 52.8173 17.6358C55.5279 9.54781 60.8173 14.6358 60.8173 14.6358C65.2758 3.34835 80.3194 9.80239 80.4946 16.7258C82.1707 12.5032 93.2899 7.85892 95.8173 17.6358C107.629 9.8736 112.626 11.8843 119.317 24.1358C138.05 12.5468 163.368 40.1512 137.317 54.6358C139.08 60.2226 128.636 71.0467 116.817 59.1358C110.88 58.9633 107.445 59.1374 104.817 50.6358C98.9702 56.78 89.817 53.1358 89.817 53.1358C79.1264 56.6159 77.3173 50.6358 77.3173 50.6358C76.0151 56.6997 71.5986 56.0298 66 55C57.4455 57.1473 56.1861 57.7778 48.8173 54.6358C42.7717 60.6875 39.1126 62.4092 31.317 57.6358C17.6639 64.5124 21.3173 54.6358 21.3173 54.6358C13.6924 56.9356 7.22482 46.4781 21.3173 42.6358Z" fill="#F1ECE5" stroke="#E0D9CE" stroke-width="1"/>
         </g>
       </g>
@@ -247,8 +243,8 @@
         </g>
       </g>
 
-    </svg><!-- /sheep-svg -->
-  </div><!-- /sheep-stage -->
+    </svg>
+  </div>
 
   <div class="phase-label" id="phaseLabel"></div>
   <div class="timer-dots"  id="timerDots"></div>
@@ -257,8 +253,8 @@
   </div>
 </div>
 
-<div class="stop-hint" id="stopHint">click para pausar</div>
-<div class="counter"   id="counter"></div>
+<button class="pause-btn" id="pauseBtn">Pausar</button>
+<div class="counter" id="counter"></div>
 
 <script>
 // Stars
@@ -279,7 +275,7 @@ const PHASES = [
   { name:'Pausa',   duration:2000, type:'pause',   dots:2 },
 ];
 const TOTAL = PHASES.reduce((a,p)=>a+p.duration,0);
-const ARC_C = 2*Math.PI*125; // r=125
+const ARC_C = 2*Math.PI*125;
 
 // DOM
 const gCuerpo    = document.getElementById('g-cuerpo');
@@ -290,12 +286,10 @@ const phaseLabel = document.getElementById('phaseLabel');
 const timerDots  = document.getElementById('timerDots');
 const ctaArea    = document.getElementById('ctaArea');
 const ctaBtn     = document.getElementById('ctaBtn');
-const sheepStage = document.getElementById('sheepStage');
-const stopHint   = document.getElementById('stopHint');
+const pauseBtn   = document.getElementById('pauseBtn');
 const counter    = document.getElementById('counter');
 
 let running=false, rafId=null, cycleStart=0, cycleCount=0, lastPhaseType=null;
-let pulseAnim = null;
 
 function eio(t){ return t<0.5?2*t*t:-1+(4-2*t)*t; }
 function lerp(a,b,t){ return a+(b-a)*t; }
@@ -304,7 +298,6 @@ function setBodyScale(sx,sy){
   gCuerpo.style.transform=`scale(${sx},${sy})`;
 }
 function setShadowScale(sx,sy){
-  // sombra transform-origin is its center (140,242)
   gSombra.style.transform=`scale(${sx},${sy})`;
 }
 function setArc(f){
@@ -383,31 +376,36 @@ function tick(ts){
 function start(){
   running=true; cycleStart=performance.now(); lastPhaseType=null;
   ctaArea.style.visibility='hidden';
-  stopHint.style.opacity='1';
+  pauseBtn.classList.add('visible');
+  pauseBtn.textContent='Pausar';
   setPhaseUI(PHASES[0]);
   rafId=requestAnimationFrame(tick);
 }
+
 function stop(){
   running=false; cancelAnimationFrame(rafId);
   setArc(0); setPulse(false);
+  setBodyScale(1,1); setShadowScale(1,1);
   setPhaseUI(null); timerDots.innerHTML='';
   cycleCount=0; counter.textContent='';
   ctaArea.style.visibility='visible';
-  stopHint.style.opacity='0'; lastPhaseType=null;
+  pauseBtn.classList.remove('visible');
+  lastPhaseType=null;
 }
 
 ctaBtn.addEventListener('click', start);
-sheepStage.addEventListener('click', ()=>{ running?stop():start(); });
+pauseBtn.addEventListener('click', stop);
 setArc(0);
 </script>
 
 <style>
-  /* Pulse keyframe needs rotate origin in SVG space */
   @keyframes ringPulse {
     0%   { transform:scale(1);   opacity:0.6; }
     100% { transform:scale(1.8); opacity:0; }
   }
   #ringPulseEl { transform-box: fill-box; transform-origin: center; }
 </style>
+</body>
+</html>
 </body>
 </html>
